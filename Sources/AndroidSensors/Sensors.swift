@@ -15,41 +15,21 @@ import AndroidCore
 import Observation
 import SwiftJava
 
-/// The well-known sensor types (`Sensor.TYPE_*`); anything else is `.other`.
-public enum ASensorKind: Sendable, Hashable {
-    case accelerometer
-    case magneticField
-    case gyroscope
-    case light
-    case pressure
-    case proximity
-    case gravity
-    case linearAcceleration
-    case rotationVector
-    case relativeHumidity
-    case ambientTemperature
-    case stepDetector
-    case stepCounter
-    case other(Int32)
-
-    init(type: Int32) {
-        switch type {
-        case 1: self = .accelerometer
-        case 2: self = .magneticField
-        case 4: self = .gyroscope
-        case 5: self = .light
-        case 6: self = .pressure
-        case 8: self = .proximity
-        case 9: self = .gravity
-        case 10: self = .linearAcceleration
-        case 11: self = .rotationVector
-        case 12: self = .relativeHumidity
-        case 13: self = .ambientTemperature
-        case 18: self = .stepDetector
-        case 19: self = .stepCounter
-        default: self = .other(type)
-        }
-    }
+/// The well-known sensor types: `Sensor.TYPE_*`.
+public enum ASensorKind: Int32, Sendable {
+    case accelerometer = 1
+    case magneticField = 2
+    case gyroscope = 4
+    case light = 5
+    case pressure = 6
+    case proximity = 8
+    case gravity = 9
+    case linearAcceleration = 10
+    case rotationVector = 11
+    case relativeHumidity = 12
+    case ambientTemperature = 13
+    case stepDetector = 18
+    case stepCounter = 19
 
     /// The unit of its readings.
     public var unit: String {
@@ -63,26 +43,17 @@ public enum ASensorKind: Sendable, Hashable {
         case .relativeHumidity: "%"
         case .ambientTemperature: "°C"
         case .stepDetector, .stepCounter: "steps"
-        case .rotationVector, .other: ""
+        case .rotationVector: ""
         }
     }
 }
 
-/// How often a sensor reports (`SensorManager.SENSOR_DELAY_*`).
-public enum ASensorRate: Sendable, Hashable {
-    case normal
-    case ui
-    case game
-    case fastest
-
-    var samplingPeriod: Int32 {
-        switch self {
-        case .fastest: 0
-        case .game: 1
-        case .ui: 2
-        case .normal: 3
-        }
-    }
+/// How often a sensor reports: `SensorManager.SENSOR_DELAY_*`.
+public enum ASensorRate: Int32, Sendable {
+    case fastest = 0
+    case game = 1
+    case ui = 2
+    case normal = 3
 }
 
 // MARK: - ASensors
@@ -121,10 +92,13 @@ public final class ASensors: @unchecked Sendable {
 public final class ASensor: Identifiable, @unchecked Sendable {
     public let name: String
     public let vendor: String
-    public let kind: ASensorKind
+    /// Android's `Sensor.TYPE_*` for it.
+    public let type: Int32
+    /// `type` as one of the well-known kinds; nil for any other.
+    public let kind: ASensorKind?
     /// Android's name for its type ("android.sensor.accelerometer").
     public let typeName: String
-    /// Largest value it reports, in `kind.unit`.
+    /// Largest value it reports, in `unit`.
     public let maximumRange: Float
     public let resolution: Float
     /// Milliamps while running.
@@ -135,7 +109,7 @@ public final class ASensor: Identifiable, @unchecked Sendable {
     public private(set) var isRunning = false
     /// How often it reports, while running.
     public private(set) var rate: ASensorRate = .ui
-    /// The latest reading: one value per axis or quantity, in `kind.unit`.
+    /// The latest reading: one value per axis or quantity, in `unit`.
     public private(set) var values: [Float] = []
     /// `SensorManager.SENSOR_STATUS_*`: 0 unreliable … 3 high.
     public private(set) var accuracy: Int = 0
@@ -143,6 +117,9 @@ public final class ASensor: Identifiable, @unchecked Sendable {
     public private(set) var timestamp: Int64 = 0
 
     public var id: String { "\(typeName)/\(name)" }
+
+    /// The unit of its readings ("" when its kind is not a well-known one).
+    public var unit: String { kind?.unit ?? "" }
 
     @ObservationIgnored private let manager: SensorManager
     @ObservationIgnored private var listener: SensorListener?
@@ -153,7 +130,8 @@ public final class ASensor: Identifiable, @unchecked Sendable {
         self.manager = manager
         name = sensor.getName()
         vendor = sensor.getVendor()
-        kind = ASensorKind(type: sensor.getType())
+        type = sensor.getType()
+        kind = ASensorKind(rawValue: type)
         typeName = sensor.getStringType()
         maximumRange = sensor.getMaximumRange()
         resolution = sensor.getResolution()
@@ -209,7 +187,7 @@ public final class ASensor: Identifiable, @unchecked Sendable {
         guard let listener else { return false }
         manager.unregisterListener(listener.eventListener)
         isRunning = manager.registerListener(
-            listener.eventListener, sensor, rate.samplingPeriod, try AndroidMainThread.shared.mainHandler(in: environment))
+            listener.eventListener, sensor, rate.rawValue, try AndroidMainThread.shared.mainHandler(in: environment))
         self.rate = rate
         return isRunning
     }

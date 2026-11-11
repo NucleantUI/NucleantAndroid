@@ -13,22 +13,12 @@ import AndroidHardwareCamera2
 import Observation
 import SwiftJava
 
-/// Which way a camera faces.
-public enum ACameraPosition: Sendable, Hashable {
-    case front
-    case back
+/// Which way a camera faces: `CameraCharacteristics.LENS_FACING_*`.
+public enum ACameraPosition: Int32, Sendable {
+    case front = 0
+    case back = 1
     /// Plugged in rather than built in (USB, or an emulator's webcam).
-    case external
-
-    /// From `CameraCharacteristics.LENS_FACING`.
-    init?(lensFacing: Int32) {
-        switch lensFacing {
-        case 0: self = .front
-        case 1: self = .back
-        case 2: self = .external
-        default: return nil
-        }
-    }
+    case external = 2
 }
 
 /// Whether the app may use the cameras.
@@ -128,7 +118,7 @@ public final class ACamera: Identifiable, @unchecked Sendable {
         self.id = id
         self.characteristics = characteristics
         let facing = characteristics.get(keys.LENS_FACING)?.as(JavaInteger.self)?.intValue()
-        position = facing.flatMap(ACameraPosition.init(lensFacing:)) ?? .external
+        position = facing.flatMap(ACameraPosition.init(rawValue:)) ?? .external
         hasFlash = characteristics.get(keys.FLASH_INFO_AVAILABLE)?.as(JavaBoolean.self)?.booleanValue() ?? false
         sensorOrientation = Int(characteristics.get(keys.SENSOR_ORIENTATION)?.as(JavaInteger.self)?.intValue() ?? 0)
 

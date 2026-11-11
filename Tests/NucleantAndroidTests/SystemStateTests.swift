@@ -16,17 +16,17 @@ import Testing
     }
 
     @Test func extrasMapOntoStates() {
-        #expect(ABatteryState(status: 2) == .charging)
-        #expect(ABatteryState(status: 3) == .discharging)
-        #expect(ABatteryState(status: 4) == .notCharging)
-        #expect(ABatteryState(status: 5) == .full)
-        #expect(ABatteryState(status: 1) == .unknown)
-        #expect(APowerSource(plugged: 0) == .battery)
-        #expect(APowerSource(plugged: 1) == .ac)
-        #expect(APowerSource(plugged: 2) == .usb)
-        #expect(APowerSource(plugged: 4) == .wireless)
-        #expect(ABatteryHealth(health: 2) == .good)
-        #expect(ABatteryHealth(health: 3) == .overheat)
+        #expect(ABatteryState(rawValue: 2) == .charging)
+        #expect(ABatteryState(rawValue: 3) == .discharging)
+        #expect(ABatteryState(rawValue: 4) == .notCharging)
+        #expect(ABatteryState(rawValue: 5) == .full)
+        #expect(ABatteryState(rawValue: 1) == .unknown)
+        #expect(APowerSource(rawValue: 0) == .battery)
+        #expect(APowerSource(rawValue: 1) == .ac)
+        #expect(APowerSource(rawValue: 2) == .usb)
+        #expect(APowerSource(rawValue: 4) == .wireless)
+        #expect(ABatteryHealth(rawValue: 2) == .good)
+        #expect(ABatteryHealth(rawValue: 3) == .overheat)
     }
 }
 
@@ -48,28 +48,28 @@ import Testing
 
 @Suite struct SensorTests {
     @Test func typesMapOntoKindsWithUnits() {
-        #expect(ASensorKind(type: 1) == .accelerometer)
-        #expect(ASensorKind(type: 4) == .gyroscope)
-        #expect(ASensorKind(type: 5) == .light)
-        #expect(ASensorKind(type: 65_536) == .other(65_536))
+        #expect(ASensorKind(rawValue: 1) == .accelerometer)
+        #expect(ASensorKind(rawValue: 4) == .gyroscope)
+        #expect(ASensorKind(rawValue: 5) == .light)
+        #expect(ASensorKind(rawValue: 65_536) == nil)
         #expect(ASensorKind.accelerometer.unit == "m/s²")
         #expect(ASensorKind.light.unit == "lx")
     }
 
     @Test func ratesAreSensorManagersDelays() {
-        #expect(ASensorRate.fastest.samplingPeriod == 0)
-        #expect(ASensorRate.game.samplingPeriod == 1)
-        #expect(ASensorRate.ui.samplingPeriod == 2)
-        #expect(ASensorRate.normal.samplingPeriod == 3)
+        #expect(ASensorRate.fastest.rawValue == 0)
+        #expect(ASensorRate.game.rawValue == 1)
+        #expect(ASensorRate.ui.rawValue == 2)
+        #expect(ASensorRate.normal.rawValue == 3)
     }
 }
 
 @Suite struct NetworkTests {
     @Test func transportsUseAndroidsIDs() {
-        #expect(ANetworkTransport.cellular.transportID == 0)
-        #expect(ANetworkTransport.wifi.transportID == 1)
-        #expect(ANetworkTransport.ethernet.transportID == 3)
-        #expect(ANetworkTransport.vpn.transportID == 4)
+        #expect(ANetworkTransport.cellular.rawValue == 0)
+        #expect(ANetworkTransport.wifi.rawValue == 1)
+        #expect(ANetworkTransport.ethernet.rawValue == 3)
+        #expect(ANetworkTransport.vpn.rawValue == 4)
     }
 }
 
@@ -86,10 +86,10 @@ import Testing
 
 @Suite struct BiometricsTests {
     @Test func codesMapOntoAvailability() {
-        #expect(ABiometricAvailability(code: 0) == .available)
-        #expect(ABiometricAvailability(code: 11) == .noneEnrolled)
-        #expect(ABiometricAvailability(code: 12) == .noHardware)
-        #expect(ABiometricAvailability(code: 1) == .unavailable)
-        #expect(ABiometricAvailability(code: 99) == .unknown(99))
+        #expect(ABiometricAvailability(rawValue: 0) == .available)
+        #expect(ABiometricAvailability(rawValue: 11) == .noneEnrolled)
+        #expect(ABiometricAvailability(rawValue: 12) == .noHardware)
+        #expect(ABiometricAvailability(rawValue: 1) == .unavailable)
+        #expect(ABiometricAvailability(rawValue: 99) == nil)
     }
 }

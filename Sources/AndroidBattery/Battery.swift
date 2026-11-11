@@ -14,66 +14,34 @@ import AndroidCore
 import Observation
 import SwiftJava
 
-/// Whether the battery is charging (`BatteryManager.BATTERY_STATUS_*`).
-public enum ABatteryState: Sendable, Hashable {
-    case unknown
-    case charging
-    case discharging
+/// Whether the battery is charging: `BatteryManager.BATTERY_STATUS_*`.
+public enum ABatteryState: Int32, Sendable {
+    case unknown = 1
+    case charging = 2
+    case discharging = 3
     /// Plugged in, but not taking charge.
-    case notCharging
-    case full
-
-    init(status: Int32) {
-        switch status {
-        case 2: self = .charging
-        case 3: self = .discharging
-        case 4: self = .notCharging
-        case 5: self = .full
-        default: self = .unknown
-        }
-    }
+    case notCharging = 4
+    case full = 5
 }
 
-/// What the device is plugged into (`BatteryManager.BATTERY_PLUGGED_*`).
-public enum APowerSource: Sendable, Hashable {
-    case battery
-    case ac
-    case usb
-    case wireless
-    case dock
-
-    init(plugged: Int32) {
-        switch plugged {
-        case 1: self = .ac
-        case 2: self = .usb
-        case 4: self = .wireless
-        case 8: self = .dock
-        default: self = .battery
-        }
-    }
+/// What the device is plugged into: `BatteryManager.BATTERY_PLUGGED_*`.
+public enum APowerSource: Int32, Sendable {
+    case battery = 0
+    case ac = 1
+    case usb = 2
+    case wireless = 4
+    case dock = 8
 }
 
 /// `BatteryManager.BATTERY_HEALTH_*`.
-public enum ABatteryHealth: Sendable, Hashable {
-    case unknown
-    case good
-    case overheat
-    case dead
-    case overVoltage
-    case failure
-    case cold
-
-    init(health: Int32) {
-        switch health {
-        case 2: self = .good
-        case 3: self = .overheat
-        case 4: self = .dead
-        case 5: self = .overVoltage
-        case 6: self = .failure
-        case 7: self = .cold
-        default: self = .unknown
-        }
-    }
+public enum ABatteryHealth: Int32, Sendable {
+    case unknown = 1
+    case good = 2
+    case overheat = 3
+    case dead = 4
+    case overVoltage = 5
+    case failure = 6
+    case cold = 7
 }
 
 /// The battery, as Android last reported it. Create and use it on the main
@@ -152,9 +120,9 @@ public final class ABattery: @unchecked Sendable {
     /// From a BATTERY_CHANGED intent's extras (`BatteryManager.EXTRA_*`).
     private func update(from intent: Intent) {
         level = Self.level(raw: intent.getIntExtra("level", -1), scale: intent.getIntExtra("scale", -1))
-        state = ABatteryState(status: intent.getIntExtra("status", 1))
-        powerSource = APowerSource(plugged: intent.getIntExtra("plugged", 0))
-        health = ABatteryHealth(health: intent.getIntExtra("health", 1))
+        state = ABatteryState(rawValue: intent.getIntExtra("status", 1)) ?? .unknown
+        powerSource = APowerSource(rawValue: intent.getIntExtra("plugged", 0)) ?? .battery
+        health = ABatteryHealth(rawValue: intent.getIntExtra("health", 1)) ?? .unknown
         let tenthsOfDegree = intent.getIntExtra("temperature", Int32.min)
         temperature = tenthsOfDegree == Int32.min ? nil : Double(tenthsOfDegree) / 10
         let millivolts = intent.getIntExtra("voltage", -1)

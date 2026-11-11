@@ -27,9 +27,9 @@ import Testing
     }
 
     @Test func effectsUseAndroidsIDs() {
-        #expect(AHapticEffect.click.effectID == 0)
-        #expect(AHapticEffect.doubleClick.effectID == 1)
-        #expect(AHapticEffect.tick.effectID == 2)
-        #expect(AHapticEffect.heavyClick.effectID == 5)
+        #expect(AHapticEffect.click.rawValue == 0)
+        #expect(AHapticEffect.doubleClick.rawValue == 1)
+        #expect(AHapticEffect.tick.rawValue == 2)
+        #expect(AHapticEffect.heavyClick.rawValue == 5)
     }
 }

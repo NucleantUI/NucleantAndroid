@@ -126,7 +126,7 @@ public final class LabSensor: @unchecked Sendable {
     public var name: String { sensor.name }
     public var vendor: String { sensor.vendor }
     public var typeName: String { sensor.typeName }
-    public var unit: String { sensor.kind.unit }
+    public var unit: String { sensor.unit }
     public var maximumRange: Float { sensor.maximumRange }
     public var resolution: Float { sensor.resolution }
     /// Milliamps.

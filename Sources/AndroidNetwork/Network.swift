@@ -15,23 +15,13 @@ import AndroidCore
 import Observation
 import SwiftJava
 
-/// How a network reaches the outside (`NetworkCapabilities.TRANSPORT_*`).
-public enum ANetworkTransport: Sendable, Hashable, CaseIterable {
-    case cellular
-    case wifi
-    case bluetooth
-    case ethernet
-    case vpn
-
-    var transportID: Int32 {
-        switch self {
-        case .cellular: 0
-        case .wifi: 1
-        case .bluetooth: 2
-        case .ethernet: 3
-        case .vpn: 4
-        }
-    }
+/// How a network reaches the outside: `NetworkCapabilities.TRANSPORT_*`.
+public enum ANetworkTransport: Int32, Sendable, CaseIterable {
+    case cellular = 0
+    case wifi = 1
+    case bluetooth = 2
+    case ethernet = 3
+    case vpn = 4
 }
 
 /// The default network. Create and use it on the main thread, where changes
@@ -91,7 +81,7 @@ public final class ANetwork: @unchecked Sendable {
         isConnected = true
         isValidated = capabilities.hasCapability(Self.capabilityValidated)
         isMetered = !capabilities.hasCapability(Self.capabilityNotMetered)
-        transports = Set(ANetworkTransport.allCases.filter { capabilities.hasTransport($0.transportID) })
+        transports = Set(ANetworkTransport.allCases.filter { capabilities.hasTransport($0.rawValue) })
         downstreamBandwidth = Int(capabilities.getLinkDownstreamBandwidthKbps())
         upstreamBandwidth = Int(capabilities.getLinkUpstreamBandwidthKbps())
     }

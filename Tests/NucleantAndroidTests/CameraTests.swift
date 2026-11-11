@@ -3,10 +3,10 @@ import Testing
 
 @Suite struct CameraTests {
     @Test func lensFacingMapsToPosition() {
-        #expect(ACameraPosition(lensFacing: 0) == .front)
-        #expect(ACameraPosition(lensFacing: 1) == .back)
-        #expect(ACameraPosition(lensFacing: 2) == .external)
-        #expect(ACameraPosition(lensFacing: 7) == nil)
+        #expect(ACameraPosition(rawValue: 0) == .front)
+        #expect(ACameraPosition(rawValue: 1) == .back)
+        #expect(ACameraPosition(rawValue: 2) == .external)
+        #expect(ACameraPosition(rawValue: 7) == nil)
     }
 
     let jpegSizes = [(width: 4032, height: 3024), (width: 1920, height: 1080), (width: 1280, height: 720), (width: 640, height: 480)]

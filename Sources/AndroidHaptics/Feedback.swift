@@ -11,39 +11,24 @@
 import AndroidCore
 import SwiftJava
 
-/// Standard feedback kinds (`HapticFeedbackConstants`).
-public enum AHapticFeedback: Sendable, Hashable, CaseIterable {
-    /// A key or button press.
-    case tap
-    case longPress
-    case contextClick
-    /// A detent: a dial or picker passing a step.
-    case tick
-    /// Something completed (Android 11+; a click before).
-    case success
-    /// Something was refused (Android 11+; a heavy click before).
-    case error
+/// Standard feedback kinds: `HapticFeedbackConstants`.
+public enum AHapticFeedback: Int32, Sendable, CaseIterable {
+    /// A key or button press (`VIRTUAL_KEY`).
+    case tap = 1
+    case longPress = 0
+    case contextClick = 6
+    /// A detent: a dial or picker passing a step (`CLOCK_TICK`).
+    case tick = 4
+    /// Something completed (`CONFIRM`, Android 11+; a click before).
+    case success = 16
+    /// Something was refused (`REJECT`, Android 11+; a heavy click before).
+    case error = 17
     /// A drag or swipe starting / ending (Android 11+).
-    case gestureStart
-    case gestureEnd
+    case gestureStart = 12
+    case gestureEnd = 13
     /// A switch turned on / off (Android 14+).
-    case toggleOn
-    case toggleOff
-
-    var constant: Int32 {
-        switch self {
-        case .tap: 1 // VIRTUAL_KEY
-        case .longPress: 0
-        case .contextClick: 6
-        case .tick: 4 // CLOCK_TICK
-        case .success: 16 // CONFIRM
-        case .error: 17 // REJECT
-        case .gestureStart: 12
-        case .gestureEnd: 13
-        case .toggleOn: 21
-        case .toggleOff: 22
-        }
-    }
+    case toggleOn = 21
+    case toggleOff = 22
 
     /// The first Android with the constant.
     var minimumSDK: Int {
@@ -80,7 +65,7 @@ extension AVibrator {
         guard let view = try AndroidContext.shared.activity(in: environment).getWindow()?.getDecorView() else {
             return false
         }
-        return view.performHapticFeedback(feedback.constant)
+        return view.performHapticFeedback(feedback.rawValue)
     }
 }
 

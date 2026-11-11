@@ -15,28 +15,19 @@ import AndroidCore
 import Observation
 import SwiftJava
 
-/// Whether the device can authenticate with biometrics
-/// (`BiometricManager.BIOMETRIC_*`).
-public enum ABiometricAvailability: Sendable, Hashable {
-    case available
-    /// The hardware is there but nothing is enrolled.
-    case noneEnrolled
-    case noHardware
+/// Whether the device can authenticate with biometrics:
+/// `BiometricManager.BIOMETRIC_SUCCESS` / `BIOMETRIC_ERROR_*` / `BIOMETRIC_STATUS_*`.
+public enum ABiometricAvailability: Int32, Sendable {
+    case available = 0
     /// The hardware is there but busy or broken.
-    case unavailable
-    case securityUpdateRequired
-    case unknown(Int32)
-
-    init(code: Int32) {
-        switch code {
-        case 0: self = .available
-        case 11: self = .noneEnrolled
-        case 12: self = .noHardware
-        case 1: self = .unavailable
-        case 15: self = .securityUpdateRequired
-        default: self = .unknown(code)
-        }
-    }
+    case unavailable = 1
+    /// The hardware is there but nothing is enrolled.
+    case noneEnrolled = 11
+    case noHardware = 12
+    case securityUpdateRequired = 15
+    /// The requested authenticators are not supported on this Android.
+    case unsupported = -2
+    case unknown = -1
 }
 
 /// Biometric authentication. Create and use it on the main thread.
@@ -66,7 +57,7 @@ public final class ABiometrics: @unchecked Sendable {
     /// Check the hardware and enrollment again.
     public func refresh() {
         availability = ABiometricAvailability(
-            code: sdkLevel >= 30 ? manager.canAuthenticate(Self.biometricWeak) : manager.canAuthenticate())
+            rawValue: sdkLevel >= 30 ? manager.canAuthenticate(Self.biometricWeak) : manager.canAuthenticate()) ?? .unknown
     }
 
     /// Show the system's biometric prompt. True when the user authenticated,

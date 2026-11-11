@@ -22,32 +22,18 @@ import AndroidCore
 import Observation
 import SwiftJava
 
-/// How much a channel's notifications interrupt (`NotificationManager.IMPORTANCE_*`).
-public enum ANotificationImportance: Sendable, Hashable, CaseIterable {
+/// How much a channel's notifications interrupt: `NotificationManager.IMPORTANCE_*`.
+public enum ANotificationImportance: Int32, Sendable, CaseIterable {
     /// Not shown.
-    case none
+    case none = 0
     /// In the shade only, collapsed.
-    case min
+    case min = 1
     /// In the shade and the status bar, silently.
-    case low
+    case low = 2
     /// With sound.
-    case `default`
+    case `default` = 3
     /// With sound, and peeking onto the screen.
-    case high
-
-    var value: Int32 {
-        switch self {
-        case .none: 0
-        case .min: 1
-        case .low: 2
-        case .default: 3
-        case .high: 4
-        }
-    }
-
-    init(value: Int32) {
-        self = Self.allCases.first { $0.value == value } ?? .default
-    }
+    case high = 4
 }
 
 /// One of the app's notification channels, as the system has it — the user
@@ -136,7 +122,7 @@ public final class ANotifications: @unchecked Sendable {
     public func createChannel(id: String, name: String, importance: ANotificationImportance) throws {
         let environment = try JavaVirtualMachine.shared().environment()
         manager.createNotificationChannel(
-            NotificationChannel(id, charSequence(name, in: environment), importance.value, environment: environment))
+            NotificationChannel(id, charSequence(name, in: environment), importance.rawValue, environment: environment))
         refresh()
     }
 
@@ -203,7 +189,7 @@ public final class ANotifications: @unchecked Sendable {
                 channels.append(ANotificationChannel(
                     id: channel.getId(),
                     name: channel.getName()?.toString() ?? channel.getId(),
-                    importance: ANotificationImportance(value: channel.getImportance())
+                    importance: ANotificationImportance(rawValue: channel.getImportance()) ?? .default
                 ))
             }
         }

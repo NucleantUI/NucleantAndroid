@@ -14,21 +14,12 @@ import AndroidCore
 import Observation
 import SwiftJava
 
-/// The system's predefined haptic effects (`VibrationEffect.EFFECT_*`).
-public enum AHapticEffect: Sendable, Hashable, CaseIterable {
-    case click
-    case doubleClick
-    case tick
-    case heavyClick
-
-    var effectID: Int32 {
-        switch self {
-        case .click: 0
-        case .doubleClick: 1
-        case .tick: 2
-        case .heavyClick: 5
-        }
-    }
+/// The system's predefined haptic effects: `VibrationEffect.EFFECT_*`.
+public enum AHapticEffect: Int32, Sendable, CaseIterable {
+    case click = 0
+    case doubleClick = 1
+    case tick = 2
+    case heavyClick = 5
 }
 
 /// The vibrator.
@@ -77,14 +68,14 @@ public final class AVibrator: @unchecked Sendable {
     /// Play one of the system's haptic effects.
     public func play(_ effect: AHapticEffect) throws {
         let effects = try JavaClass<VibrationEffect>(environment: JavaVirtualMachine.shared().environment())
-        try vibrator.vibrate(effects.createPredefined(effect.effectID))
+        try vibrator.vibrate(effects.createPredefined(effect.rawValue))
     }
 
     /// Whether the device has a tuned implementation of `effect` (Android 11+;
     /// nil when it cannot tell). Without one, Android plays an approximation.
     public func supports(_ effect: AHapticEffect) -> Bool? {
         guard sdkLevel >= 30 else { return nil }
-        switch vibrator.areEffectsSupported([effect.effectID]).first {
+        switch vibrator.areEffectsSupported([effect.rawValue]).first {
         case 1: return true
         case 2: return false
         default: return nil

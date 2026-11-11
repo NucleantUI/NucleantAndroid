@@ -47,22 +47,22 @@ import Testing
 
 @Suite struct NotificationTests {
     @Test func importanceUsesAndroidsValues() {
-        #expect(ANotificationImportance.none.value == 0)
-        #expect(ANotificationImportance.low.value == 2)
-        #expect(ANotificationImportance.default.value == 3)
-        #expect(ANotificationImportance.high.value == 4)
-        #expect(ANotificationImportance(value: 4) == .high)
-        #expect(ANotificationImportance(value: -1000) == .default) // IMPORTANCE_UNSPECIFIED
+        #expect(ANotificationImportance.none.rawValue == 0)
+        #expect(ANotificationImportance.low.rawValue == 2)
+        #expect(ANotificationImportance.default.rawValue == 3)
+        #expect(ANotificationImportance.high.rawValue == 4)
+        #expect(ANotificationImportance(rawValue: 4) == .high)
+        #expect(ANotificationImportance(rawValue: -1000) == nil) // IMPORTANCE_UNSPECIFIED
     }
 }
 
 @Suite struct HapticFeedbackTests {
     @Test func feedbackUsesHapticFeedbackConstants() {
-        #expect(AHapticFeedback.longPress.constant == 0)
-        #expect(AHapticFeedback.tap.constant == 1)
-        #expect(AHapticFeedback.success.constant == 16)
-        #expect(AHapticFeedback.error.constant == 17)
-        #expect(AHapticFeedback.toggleOn.constant == 21)
+        #expect(AHapticFeedback.longPress.rawValue == 0)
+        #expect(AHapticFeedback.tap.rawValue == 1)
+        #expect(AHapticFeedback.success.rawValue == 16)
+        #expect(AHapticFeedback.error.rawValue == 17)
+        #expect(AHapticFeedback.toggleOn.rawValue == 21)
     }
 
     @Test func newerKindsFallBackOnOlderAndroids() {
